@@ -27,8 +27,8 @@ jobs:
 
       - name: Run k6 Tests
         run: |
-          k6 run scripts/main-test.js --out json=k6-results.json
-          k6 run scripts/bdd.js --out json=k6-results.json
+          k6 run ./scripts/main-test.js --out json=k6-results.json
+          k6 run ./scripts/bdd.js --out json=k6-results.json
 
       - name: Generate HTML Report
         run: k6-to-html k6-results.json reports/html/results.html
