@@ -37,7 +37,7 @@ export const options = {
 const BASE_URL = 'https://reqres.in'; // Replace with your actual base URL
 
 export default function () {
-    group('User Journey: Home to Login to Dashboard', function () {
+    group('User Journey: Login', function () {
         // Step 1: Visit Base URL
         let homeRes = http.get(`${BASE_URL}`);
         pageLoadTime.add(homeRes.timings.duration);
