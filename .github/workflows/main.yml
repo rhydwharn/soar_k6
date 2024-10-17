@@ -19,29 +19,28 @@ jobs:
       - name: Set Up k6
         uses: grafana/setup-k6@v2
         with:
-          k6-version: 'latest' 
+          k6-version: 'latest'
 
       - name: Install k6-to-html
-  run: npm install -g k6-to-html
-
-    - name: Generate HTML Report
-  run: k6-to-html k6-results.json reports/html/results.html
-
-- name: Upload HTML Report
-  uses: actions/upload-artifact@v3
-  with:
-    name: k6-html-report
-    path: reports/html/results.html
+        run: npm install -g k6-to-html
 
       - name: Run k6 Tests
         run: |
-          k6 run scripts/main-test.js
-          k6 run scripts/bdd.js
+          k6 run scripts/main-test.js --out json=k6-results.json
+          k6 run scripts/bdd.js --out json=k6-results.json
 
-      # Optional: Upload k6 test results or artifacts
+      - name: Generate HTML Report
+        run: k6-to-html k6-results.json reports/html/results.html
+
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-html-report
+          path: reports/html/results.html
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: k6-results
-          path: k6-results.json # Modify based on your script's output
+          path: k6-results.json
