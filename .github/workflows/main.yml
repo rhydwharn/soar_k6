@@ -30,9 +30,6 @@ jobs:
           k6 run scripts/main_test.js --out json=k6-results.json
           k6 run scripts/bdd.js --out json=k6-results.json
 
-      - name: Generate HTML Report
-        run: k6-to-html k6-results.json reports/html/results.html
-
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v3
