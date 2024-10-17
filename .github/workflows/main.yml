@@ -25,9 +25,6 @@ jobs:
           sudo apt update
           sudo apt install -y k6
 
-      - name: Install k6-to-html
-        run: npm install -g k6-to-html
-
       - name: Run k6 Tests
         run: |
           k6 run scripts/main-test.js --out json=k6-results.json
@@ -35,12 +32,6 @@ jobs:
 
       - name: Generate HTML Report
         run: k6-to-html k6-results.json reports/html/results.html
-
-      - name: Upload HTML Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: k6-html-report
-          path: reports/html/results.html
 
       - name: Upload Test Results
         if: always()
