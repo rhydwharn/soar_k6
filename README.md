@@ -10,19 +10,13 @@ This project uses **k6** to perform load and stress testing on a server endpoint
 my-k6-project/
 │
 ├── scripts/
-│   ├── load_test.js          # Basic load test simulating 100 users
-│   └── stress_test.js        # Advanced stress test for higher loads
-│
-├── data/
-│   ├── test_data.json        # Sample data used in the tests
-│   └── ...                   # Additional data files
+│   ├── main_test.js          # Main test for both load and stress test
+│   └── bdd.js        # Advanced stress test using BDD
 │
 ├── .github/
 │   └── workflows/
-│       └── k6_pipeline.yml   # GitHub Actions workflow for running k6 tests
-├── k6config.json             # k6 configuration file for stages and thresholds
+│       └── main.yml   # GitHub Actions workflow for running k6 tests
 ├── README.md                 # Project documentation (this file)
-└── LICENSE                   # License file
 ```
 **Prerequisites**
 
@@ -36,13 +30,13 @@ my-k6-project/
 
 	1.	Clone the repository:
 ```bash
-git clone https://github.com/your-username/my-k6-project.git
-cd my-k6-project
+git clone https://github.com/rhydwharn/soar_k6.git
+cd soar_k6
 ```
 
 	2.	Run the tests locally:
 ```bash
-k6 run scripts/load_test.js
+k6 run scripts/main_test.js
 ```
 ## **GitHub Actions Integration**
 
@@ -50,7 +44,7 @@ The project is integrated with GitHub Actions to run k6 tests automatically in t
 
 Sample GitHub Actions Workflow
 ```yaml
-name: k6 Load Test
+name: k6 Performance Tests
 
 on:
   push:
@@ -61,25 +55,31 @@ on:
       - main
 
 jobs:
-  load_test:
+  performance-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Install k6
         run: |
           sudo apt update
+          sudo apt install -y gnupg software-properties-common ca-certificates curl
+          curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list > /dev/null
+          sudo apt update
           sudo apt install -y k6
 
-      - name: Run k6 load test
+      - name: Run k6 Tests
         run: |
-          k6 run scripts/load_test.js
+          k6 run scripts/main_test.js --out json=k6-results.json
+          k6 run scripts/bdd.js --out json=k6-results.json
 
-      - name: Upload Results
-        uses: actions/upload-artifact@v2
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          name: load-test-results
-          path: ./results/
+          name: k6-results
+          path: k6-results.json
 ```
